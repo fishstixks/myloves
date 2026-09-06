@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>for Julie Ann ❤️</title>
+<meta name="theme-color" content="#ffe3ec">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Ambient decorative sparkle layer, purely cosmetic -->
+<div id="sparkleLayer" class="sparkle-layer" aria-hidden="true"></div>
+
+<!-- ============================================================ -->
+<!-- GLOBAL MUSIC BAR (mute/volume) -->
+<!-- ============================================================ -->
+<div id="musicBar" class="music-bar">
+  <button id="muteBtn" class="icon-btn" aria-label="Toggle music">🔊</button>
+  <input id="volumeSlider" type="range" min="0" max="1" step="0.01" value="0.6" aria-label="Music volume">
+  <span id="musicStatus" class="music-status">—</span>
+</div>
+
+<!-- ============================================================ -->
+<!-- SCREEN: HOME -->
+<!-- ============================================================ -->
+<section id="screen-home" class="screen active">
+  <div class="home-wrap">
+    <div class="home-decor" aria-hidden="true">🌸</div>
+    <h1 class="home-title">for <span id="homeNameSpan">Julie Ann</span> <span class="heart-pulse">❤️</span></h1>
+    <p class="home-subtitle">just something I made for you.</p>
+
+    <div class="home-buttons">
+      <button class="big-btn game-btn" id="btnGoGame">
+        <span class="big-btn-emoji">🎮</span>
+        <span class="big-btn-label">A Little Game</span>
+      </button>
+      <button class="big-btn photo-btn" id="btnGoPhotobooth">
+        <span class="big-btn-emoji">📸</span>
+        <span class="big-btn-label">Photobooth</span>
+      </button>
+    </div>
+
+    <p class="home-footnote">tap around, take your time 🎀</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SCREEN: GAME INTRO -->
+<!-- ============================================================ -->
+<section id="screen-game-intro" class="screen">
+  <button class="back-btn" data-go="screen-home">←</button>
+  <div class="center-wrap">
+    <div class="big-emoji-float">🎮</div>
+    <h2 class="msg-title">a little game, just for you</h2>
+    <p class="msg-body">six tiny levels. shouldn't take long. made with you in mind the whole way through.</p>
+    <button class="cta-btn" id="btnStartGame">let's go →</button>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- LEVEL 1: DESSERT COLLECTOR -->
+<!-- ============================================================ -->
+<section id="screen-level-dessert" class="screen">
+  <div class="level-hud">
+    <span class="level-label">LEVEL 1 · DESSERT</span>
+    <span class="level-score">score: <b id="dessertScore">0</b></span>
+  </div>
+  <div class="game-stage" id="dessertStage">
+    <!-- falling items injected by JS -->
+    <div class="catcher" id="dessertCatcher">🧺</div>
+  </div>
+  <p class="game-caption" id="dessertCaption">catch what you love 🍪</p>
+</section>
+
+<!-- ============================================================ -->
+<!-- LEVEL 2: SHOPPING -->
+<!-- ============================================================ -->
+<section id="screen-level-shopping" class="screen">
+  <div class="level-hud">
+    <span class="level-label">LEVEL 2 · SHOPPING</span>
+    <span class="level-score">cart: <b id="shoppingCount">0</b></span>
+  </div>
+  <p class="game-caption" id="shoppingCaption">just looking...</p>
+  <div class="shop-grid" id="shopGrid"></div>
+  <button class="cta-btn small-cta hidden" id="btnShoppingNext">okay maybe everything →</button>
+</section>
+
+<!-- ============================================================ -->
+<!-- LEVEL 3: THE EXPENSIVE COMPLAINT -->
+<!-- ============================================================ -->
+<section id="screen-level-expensive" class="screen">
+  <div class="level-hud">
+    <span class="level-label">LEVEL 3 · THE COMPLAINT</span>
+  </div>
+  <div id="expensivePhaseA">
+    <p class="game-caption">the regular store...</p>
+    <div class="shop-grid" id="expensiveGrid"></div>
+    <button class="cta-btn small-cta" id="btnExpensiveReact">check total →</button>
+  </div>
+
+  <div id="expensivePhaseB" class="hidden center-wrap">
+    <div class="big-emoji-float">😭</div>
+    <h2 class="msg-title" id="expensiveReactText">why is everything so expensive</h2>
+    <button class="cta-btn hidden" id="btnWait">wait...</button>
+  </div>
+
+  <div id="expensivePhaseC" class="hidden center-wrap">
+    <h2 class="msg-title">pinduoduo.</h2>
+    <p class="msg-body">a much better idea has entered the chat.</p>
+    <button class="cta-btn" id="btnGoBargain">enter the bargain shop →</button>
+  </div>
+
+  <div id="expensivePhaseD" class="hidden">
+    <p class="game-caption">bargain finds incoming 🛍️</p>
+    <div class="shop-grid bargain-grid" id="bargainGrid"></div>
+    <div class="cart-total">total: <b id="bargainTotal">$0.00</b></div>
+    <button class="cta-btn small-cta hidden" id="btnPlaceOrder">place order →</button>
+  </div>
+
+  <div id="expensivePhaseE" class="hidden center-wrap">
+    <div class="order-status" id="orderStatusText">ORDER PLACED 📦</div>
+    <div class="package-anim" id="packageAnim">📦</div>
+  </div>
+
+  <div id="expensivePhaseF" class="hidden center-wrap">
+    <h2 class="msg-title">LOOK WHAT I GOT</h2>
+    <div class="haul-reveal" id="haulReveal"></div>
+    <p class="msg-body">julie is happy.</p>
+    <button class="cta-btn" id="btnAfterHaul">next →</button>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- LEVEL 4: FOOD & DRINK RUN -->
+<!-- ============================================================ -->
+<section id="screen-level-food" class="screen">
+  <div class="level-hud">
+    <span class="level-label">LEVEL 4 · FOOD RUN</span>
+    <span class="level-score">points: <b id="foodScore">0</b></span>
+  </div>
+  <div class="game-stage" id="foodStage">
+    <div class="catcher runner" id="foodCatcher">🏃‍♀️</div>
+  </div>
+  <div class="buff-bar" id="buffBar"></div>
+  <p class="game-caption" id="foodCaption">grab the good stuff 🧋</p>
+</section>
+
+<!-- ============================================================ -->
+<!-- LEVEL 5: FIND APPLE -->
+<!-- ============================================================ -->
+<section id="screen-level-apple" class="screen">
+  <div class="level-hud">
+    <span class="level-label">LEVEL 5 · APPLE</span>
+  </div>
+  <div class="center-wrap" id="appleIntro">
+    <div class="big-emoji-float">🐶</div>
+    <h2 class="msg-title" id="appleMsg">where did apple go?</h2>
+  </div>
+  <div class="find-stage hidden" id="appleStage"></div>
+  <p class="game-caption hidden" id="appleCaption">tap around to find him</p>
+</section>
+
+<!-- ============================================================ -->
+<!-- LEVEL 6: BEAT THE BILLIONAIRES -->
+<!-- ============================================================ -->
+<section id="screen-level-billionaires" class="screen">
+  <div class="center-wrap">
+    <p class="game-caption">tap to earn</p>
+    <div class="money-counter" id="moneyCounter">$1</div>
+    <button class="tap-coin" id="btnTapMoney">💰</button>
+    <div class="rich-list" id="richList"></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- GAME COMPLETE / TRANSITION TO EMOTIONAL ENDING -->
+<!-- ============================================================ -->
+<section id="screen-ending" class="screen ending-screen">
+  <div class="center-wrap ending-wrap">
+    <p class="ending-line" id="endingLine1"></p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- FINAL VIDEO -->
+<!-- ============================================================ -->
+<section id="screen-video" class="screen video-screen">
+  <div class="video-wrap">
+    <video id="apologyVideo" playsinline controls poster=""></video>
+    <button class="tap-to-watch" id="btnTapToWatch">tap to watch ❤️</button>
+  </div>
+  <button class="cta-btn ghost-btn" id="btnBackHomeFromVideo">back to home</button>
+</section>
+
+<!-- ============================================================ -->
+<!-- SCREEN: PHOTOBOOTH HOME -->
+<!-- ============================================================ -->
+<section id="screen-photobooth-home" class="screen">
+  <button class="back-btn" data-go="screen-home">←</button>
+  <div class="pb-home-wrap">
+    <h2 class="msg-title">photobooth</h2>
+    <p class="msg-body small-note">your photos stay on this device.</p>
+    <div class="pb-home-buttons">
+      <button class="big-btn" id="btnOpenCamera">
+        <span class="big-btn-emoji">📷</span>
+        <span class="big-btn-label">Take Photos</span>
+      </button>
+      <button class="big-btn" id="btnOpenAlbum">
+        <span class="big-btn-emoji">📔</span>
+        <span class="big-btn-label">Album</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SCREEN: LAYOUT PICKER -->
+<!-- ============================================================ -->
+<section id="screen-layout-picker" class="screen">
+  <button class="back-btn" data-go="screen-photobooth-home">←</button>
+  <div class="center-wrap">
+    <h2 class="msg-title">choose a layout</h2>
+    <div class="layout-grid">
+      <button class="layout-opt" data-count="1"><div class="layout-preview l1"></div>1 photo</button>
+      <button class="layout-opt" data-count="2"><div class="layout-preview l2"></div>2 photos</button>
+      <button class="layout-opt" data-count="3"><div class="layout-preview l3"></div>3 photos</button>
+      <button class="layout-opt" data-count="4"><div class="layout-preview l4"></div>4 photos</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SCREEN: CAMERA / CAPTURE -->
+<!-- ============================================================ -->
+<section id="screen-camera" class="screen camera-screen">
+  <button class="back-btn light" data-go="screen-photobooth-home">←</button>
+  <div class="camera-wrap">
+    <video id="cameraVideo" playsinline autoplay muted></video>
+    <canvas id="captureCanvas" class="hidden"></canvas>
+    <div class="camera-overlay">
+      <div class="countdown-num" id="countdownNum"></div>
+      <div class="flash-flare" id="flashFlare"></div>
+      <div class="shot-indicator" id="shotIndicator"></div>
+    </div>
+    <div class="camera-error hidden" id="cameraError">
+      <p>camera not available.</p>
+      <p class="small-note" id="cameraErrorDetail"></p>
+      <button class="cta-btn" id="btnRetryCamera">try again</button>
+    </div>
+  </div>
+  <div class="camera-controls">
+    <button class="switch-cam-btn" id="btnSwitchCam">🔄</button>
+    <button class="shutter-btn" id="btnShutter"></button>
+    <div class="shutter-spacer"></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SCREEN: EDITOR (filters, stickers, frame) -->
+<!-- ============================================================ -->
+<section id="screen-editor" class="screen editor-screen">
+  <button class="back-btn" data-go="screen-photobooth-home">←</button>
+  <div class="editor-canvas-wrap">
+    <div id="editorComposition" class="editor-composition"></div>
+  </div>
+
+  <div class="editor-tabs">
+    <button class="editor-tab active" data-tab="filters">filters</button>
+    <button class="editor-tab" data-tab="frames">frames</button>
+    <button class="editor-tab" data-tab="stickers">stickers</button>
+    <button class="editor-tab" data-tab="text">text</button>
+  </div>
+
+  <div class="editor-panel" id="panelFilters">
+    <div class="filter-strip" id="filterStrip"></div>
+  </div>
+  <div class="editor-panel hidden" id="panelFrames">
+    <div class="frame-strip" id="frameStrip"></div>
+  </div>
+  <div class="editor-panel hidden" id="panelStickers">
+    <div class="sticker-categories" id="stickerCategories"></div>
+    <div class="sticker-strip" id="stickerStrip"></div>
+  </div>
+  <div class="editor-panel hidden" id="panelText">
+    <input type="text" id="textInput" placeholder="add a caption..." maxlength="40">
+    <button class="cta-btn small-cta" id="btnAddText">add text</button>
+  </div>
+
+  <div class="editor-actions">
+    <button class="action-pill" id="btnRetake">retake</button>
+    <button class="action-pill primary" id="btnDoneEditing">done</button>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SCREEN: RESULT (save/print/album/retake) -->
+<!-- ============================================================ -->
+<section id="screen-result" class="screen">
+  <div class="result-wrap">
+    <img id="resultImage" class="result-image" alt="your photobooth photo">
+    <div class="result-buttons">
+      <button class="action-pill" id="btnSave">💾 save</button>
+      <button class="action-pill" id="btnPrint">🖨️ print</button>
+      <button class="action-pill" id="btnAddToAlbum">📔 add to album</button>
+    </div>
+    <div class="result-buttons secondary">
+      <button class="action-pill ghost" id="btnRetakeFromResult">retake</button>
+      <button class="action-pill ghost" id="btnHomeFromResult">home</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SCREEN: PRINT PREVIEW -->
+<!-- ============================================================ -->
+<section id="screen-print" class="screen">
+  <button class="back-btn" data-go="screen-result">←</button>
+  <div class="center-wrap">
+    <h2 class="msg-title">print</h2>
+    <div class="print-format-grid" id="printFormatGrid">
+      <button class="print-opt" data-format="strip">2×6" strip</button>
+      <button class="print-opt" data-format="photo">4×6" photo</button>
+      <button class="print-opt" data-format="square">square</button>
+    </div>
+    <canvas id="printCanvas" class="print-canvas-preview"></canvas>
+    <button class="cta-btn" id="btnDoPrint">print now</button>
+    <p class="small-note" id="printFallbackNote"></p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SCREEN: ALBUM -->
+<!-- ============================================================ -->
+<section id="screen-album" class="screen">
+  <button class="back-btn" data-go="screen-photobooth-home">←</button>
+  <div class="album-wrap">
+    <h2 class="msg-title">album</h2>
+    <p class="small-note">your photos stay on this device.</p>
+
+    <div class="trip-filter-row" id="tripFilterRow">
+      <button class="trip-chip active" data-trip="all">all</button>
+    </div>
+    <button class="cta-btn tiny-cta" id="btnNewTrip">+ new trip</button>
+
+    <div class="album-grid" id="albumGrid"></div>
+    <p class="album-empty hidden" id="albumEmptyMsg">no photos yet — go take some 📸</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SCREEN: ALBUM PHOTO VIEWER (fullscreen) -->
+<!-- ============================================================ -->
+<section id="screen-photo-viewer" class="screen viewer-screen">
+  <button class="back-btn light" data-go="screen-album">←</button>
+  <div class="viewer-wrap">
+    <img id="viewerImage" class="viewer-image" alt="photo">
+    <div class="viewer-meta">
+      <input type="text" id="viewerCaption" placeholder="add a caption...">
+      <select id="viewerTripSelect"></select>
+      <div class="viewer-date" id="viewerDate"></div>
+    </div>
+    <div class="viewer-buttons">
+      <button class="action-pill" id="btnViewerDownload">⬇️ download</button>
+      <button class="action-pill" id="btnViewerPrint">🖨️ print</button>
+      <button class="action-pill danger" id="btnViewerDelete">🗑️ delete</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- MODAL: NEW TRIP -->
+<!-- ============================================================ -->
+<div class="modal hidden" id="modalNewTrip">
+  <div class="modal-box">
+    <h3>new trip</h3>
+    <input type="text" id="newTripName" placeholder="e.g. Japan trip 🇯🇵" maxlength="30">
+    <div class="modal-buttons">
+      <button class="action-pill ghost" id="btnCancelTrip">cancel</button>
+      <button class="action-pill primary" id="btnConfirmTrip">create</button>
+    </div>
+  </div>
+</div>
+
+<!-- audio elements are created dynamically in JS -->
+
+<script src="script.js"></script>
+</body>
+</html>
