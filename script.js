@@ -19,7 +19,7 @@ const CONFIG = {
     expensive:   "expensive.mp3",
     food:        "food.mp3",
     apple:       "apple.mp3",
-    billionaire: "billionaire.mp3",
+    drive:       "drive.mp3",
     ending:      "ending.mp3"
   },
 
@@ -46,7 +46,7 @@ const CONFIG = {
     haulReveal: "LOOK WHAT I GOT.",
     haulHappy: "julie is happy.",
     appleLines: ["where did apple go?", "oh.", "there he is.", "apple has decided this is his game now."],
-    billionaireWin: "JULIE HAS OFFICIALLY BEATEN THE BILLIONAIRES.",
+    driveWin: "MALL PARKING LOT: CLEARED.",
     endingLines: [
       "You made it to the end.",
       "I know this doesn't fix what happened.",
@@ -141,8 +141,8 @@ const State = {
   shoppingCart: [],
   bargainCart: [],
   bargainTotal: 0,
-  money: 1,
-  billionairesBeaten: 0,
+  driveScore: 0,
+  driveTimeLeft: 0,
   // Photobooth
   selectedLayoutCount: 1,
   capturedPhotos: [],   // dataURLs, one per shot in current session
@@ -152,7 +152,6 @@ const State = {
   activeFilterCls: "filter-natural",
   activeFrameCls: "frame-none",
   placedStickers: [],   // {id, emoji, x, y, scale, rotation, z}
-  placedTexts: [],      // {id, text, x, y}
   finalComposedDataUrl: null,
   editorTab: "filters",
   stickerCat: "hearts",
@@ -334,9 +333,6 @@ function randInt(min, max) { return Math.floor(rand(min, max + 1)); }
 function pick(arr) { return arr[randInt(0, arr.length - 1)]; }
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
 function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
-function fmtMoney(n) {
-  return "$" + n.toLocaleString("en-US", { minimumFractionDigits: n < 100 ? 2 : 0, maximumFractionDigits: 2 });
-}
 function fmtDate(ts) {
   const d = new Date(ts);
   return d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
@@ -856,85 +852,172 @@ function showHerGamesScene() {
 document.getElementById("btnHerGamesNext")?.addEventListener("click", () => {
   herGamesIdx++;
   if (herGamesIdx >= HERGAMES_SCENES.length) {
-    startLevelBillionaires();
+    startLevelDrive();
     return;
   }
   showHerGamesScene();
 });
 
 /* ================================================================
-   13. LEVEL 7 — BEAT THE BILLIONAIRES
+   13. LEVEL 7 — MINI COOPER MALL PARKING LOT (top-down arcade)
+   ================================================================
+   Property-only mayhem: signs, cones, shopping trolleys, pigeons,
+   boxes, mall decorations. No people are ever placed as obstacles —
+   that line is held regardless of the game's silly tone. Drag/touch
+   to steer, "run over" obstacles for a combo + comic pop-up text,
+   timed run with a GTA-style "wanted" meter that fills with chaos.
    ================================================================ */
-const MONEY_MILESTONES = [10000, 1000000, 999999999999];
-const RICH_CHARACTERS = ["Bezzy McBillion", "Elonora Musketeer", "Countess Von Cashflow"];
-let billionaireIdx = 0;
+const DRIVE_DURATION_MS = 16000;
+const DRIVE_OBSTACLES = [
+  { emoji: "🚧", label: "cone" },
+  { emoji: "🛑", label: "sign" },
+  { emoji: "🛒", label: "trolley" },
+  { emoji: "🐦", label: "pigeon" },
+  { emoji: "📦", label: "box" },
+  { emoji: "🎄", label: "mall decoration" },
+  { emoji: "🪧", label: "sign" }
+];
+const DRIVE_HIT_TEXTS = ["WHOOSH", "OOPS", "SCATTER!", "NICE ONE", "BOOM", "YEET", "CHAOS+1"];
+let driveState = null; // { car:{x,y}, obstacles:[], raf, spawnTimer, endTimer, tickTimer, dragging }
 
-function startLevelBillionaires() {
-  goToScreen("screen-level-billionaires");
-  MusicSystem.play("billionaire");
-  State.money = 1;
-  billionaireIdx = 0;
-  document.getElementById("moneyCounter").textContent = fmtMoney(State.money);
-  const list = document.getElementById("richList");
-  list.innerHTML = "";
-  RICH_CHARACTERS.forEach(name => {
-    const line = document.createElement("div");
-    line.id = "rich-" + name.replace(/\s/g, "");
-    line.textContent = "richer than you: " + name;
-    list.appendChild(line);
+function startLevelDrive() {
+  goToScreen("screen-level-drive");
+  MusicSystem.play("drive");
+
+  const stage = document.getElementById("driveStage");
+  stage.innerHTML = "";
+  const car = document.createElement("div");
+  car.className = "drive-car";
+  car.id = "driveCar";
+  car.textContent = "🚗";
+  stage.appendChild(car);
+
+  State.driveScore = 0;
+  State.driveTimeLeft = DRIVE_DURATION_MS;
+  setCaption("driveScore", "0");
+  updateWantedMeter(0);
+
+  const stageRect = stage.getBoundingClientRect();
+  driveState = {
+    car,
+    stage,
+    x: stageRect.width / 2,
+    y: stageRect.height * 0.75,
+    obstacles: [],
+    dragging: false,
+    lastFrame: performance.now()
+  };
+  positionCar();
+
+  // Drag/touch steering — car follows the pointer within the stage
+  const onPointerMove = (clientX, clientY) => {
+    if (!driveState) return;
+    const r = stage.getBoundingClientRect();
+    driveState.x = clamp(clientX - r.left, 24, r.width - 24);
+    driveState.y = clamp(clientY - r.top, 24, r.height - 24);
+    positionCar();
+    checkDriveCollisions();
+  };
+  stage.onpointerdown = (e) => { driveState.dragging = true; onPointerMove(e.clientX, e.clientY); };
+  stage.onpointermove = (e) => { if (driveState && driveState.dragging) onPointerMove(e.clientX, e.clientY); };
+  window.addEventListener("pointerup", () => { if (driveState) driveState.dragging = false; });
+
+  // Spawn obstacles on an interval
+  driveState.spawnTimer = setInterval(spawnDriveObstacle, 650);
+  for (let i = 0; i < 5; i++) spawnDriveObstacle(); // seed a few immediately
+
+  // Countdown tick
+  driveState.tickTimer = setInterval(() => {
+    State.driveTimeLeft -= 200;
+    if (State.driveTimeLeft <= 0) finishDrive();
+  }, 200);
+}
+
+function positionCar() {
+  if (!driveState) return;
+  driveState.car.style.left = driveState.x + "px";
+  driveState.car.style.top = driveState.y + "px";
+}
+
+function spawnDriveObstacle() {
+  if (!driveState) return;
+  const stage = driveState.stage;
+  const rect = stage.getBoundingClientRect();
+  const kind = pick(DRIVE_OBSTACLES);
+  const el = document.createElement("div");
+  el.className = "drive-obstacle";
+  el.textContent = kind.emoji;
+  const x = rand(20, rect.width - 20);
+  const y = rand(20, rect.height - 20);
+  el.style.left = x + "px";
+  el.style.top = y + "px";
+  stage.appendChild(el);
+  driveState.obstacles.push({ el, x, y, hit: false });
+
+  // Obstacles that linger too long fade out to keep the stage readable
+  setTimeout(() => {
+    if (el.isConnected && !el.dataset.hit) {
+      el.style.transition = "opacity 0.4s ease";
+      el.style.opacity = "0";
+      setTimeout(() => el.remove(), 400);
+    }
+  }, 3400);
+}
+
+function checkDriveCollisions() {
+  if (!driveState) return;
+  driveState.obstacles.forEach(ob => {
+    if (ob.hit || !ob.el.isConnected) return;
+    const dx = ob.x - driveState.x;
+    const dy = ob.y - driveState.y;
+    if (Math.sqrt(dx * dx + dy * dy) < 30) {
+      ob.hit = true;
+      ob.el.dataset.hit = "1";
+      onDriveHit(ob);
+    }
   });
-
-  const btn = document.getElementById("btnTapMoney");
-  btn.replaceWith(btn.cloneNode(true)); // clear old listeners on re-entry
-  document.getElementById("btnTapMoney").addEventListener("click", onTapMoney);
 }
 
-function onTapMoney(e) {
-  if (State.money >= MONEY_MILESTONES[MONEY_MILESTONES.length - 1]) return;
+function onDriveHit(ob) {
+  State.driveScore++;
+  setCaption("driveScore", String(State.driveScore));
+  updateWantedMeter(State.driveScore);
 
-  // Multiplier grows so the count-up doesn't take forever, matching spec's rapid escalation
-  const idx = billionaireIdx;
-  const target = MONEY_MILESTONES[idx] || MONEY_MILESTONES[MONEY_MILESTONES.length - 1];
-  const jump = Math.max(1, Math.floor((target - State.money) / 3)) || 1;
-  State.money = Math.min(target, State.money + jump);
-  document.getElementById("moneyCounter").textContent = fmtMoney(State.money);
+  // scatter + fade the obstacle
+  ob.el.classList.add("obstacle-hit");
+  setTimeout(() => ob.el.remove(), 350);
 
-  // floating +$ text
-  const btn = document.getElementById("btnTapMoney");
-  const rect = btn.getBoundingClientRect();
-  const float = document.createElement("div");
-  float.className = "money-float";
-  float.textContent = "+" + fmtMoney(jump);
-  float.style.position = "fixed";
-  float.style.left = rect.left + rect.width / 2 + "px";
-  float.style.top = rect.top + "px";
-  document.body.appendChild(float);
-  setTimeout(() => float.remove(), 850);
-
-  if (State.money >= target) {
-    // mark a billionaire beaten
-    if (RICH_CHARACTERS[idx]) {
-      const el = document.getElementById("rich-" + RICH_CHARACTERS[idx].replace(/\s/g, ""));
-      if (el) el.classList.add("rich-beaten");
-    }
-    billionaireIdx++;
-    if (billionaireIdx >= MONEY_MILESTONES.length) {
-      finishBillionaires();
-    }
-  }
+  // comic pop-up text
+  const pop = document.createElement("div");
+  pop.className = "drive-pop-text";
+  pop.textContent = pick(DRIVE_HIT_TEXTS);
+  pop.style.left = ob.x + "px";
+  pop.style.top = ob.y + "px";
+  driveState.stage.appendChild(pop);
+  setTimeout(() => pop.remove(), 700);
 }
 
-function finishBillionaires() {
-  document.getElementById("btnTapMoney").removeEventListener("click", onTapMoney);
-  setCaption("moneyCounter", fmtMoney(State.money));
-  const wrap = document.querySelector("#screen-level-billionaires .center-wrap");
+function updateWantedMeter(score) {
+  const meter = document.getElementById("driveWantedMeter");
+  if (!meter) return;
+  const stars = Math.min(5, Math.floor(score / 4));
+  meter.textContent = "🚨".repeat(Math.max(1, stars)) || "🚨";
+}
+
+function finishDrive() {
+  clearInterval(driveState?.spawnTimer);
+  clearInterval(driveState?.tickTimer);
+  const stage = driveState?.stage;
+  if (stage) { stage.onpointerdown = null; stage.onpointermove = null; }
+  driveState = null;
+
+  const wrap = document.querySelector("#screen-level-drive .center-wrap");
   const celebrate = document.createElement("h2");
   celebrate.className = "msg-title";
   celebrate.style.marginTop = "20px";
-  celebrate.textContent = CONFIG.messages.billionaireWin;
+  celebrate.textContent = CONFIG.messages.driveWin;
   wrap.appendChild(celebrate);
 
-  // small celebration burst
   for (let i = 0; i < 14; i++) {
     setTimeout(() => spawnCelebrationConfetti(), i * 60);
   }
@@ -944,7 +1027,7 @@ function finishBillionaires() {
 
 function spawnCelebrationConfetti() {
   const el = document.createElement("div");
-  el.textContent = pick(["🎉","✨","💸","🎊"]);
+  el.textContent = pick(["🎉","✨","🎊","🏁"]);
   el.style.position = "fixed";
   el.style.left = rand(10, 90) + "vw";
   el.style.top = "-30px";
@@ -1151,6 +1234,11 @@ function runCaptureSequence() {
         } else {
           updateShotIndicator();
           shutterBusy = false;
+          // Auto-advance into the next shot's countdown so a 4-photo
+          // layout actually captures all 4 without extra shutter taps.
+          setTimeout(() => {
+            if (!shutterBusy) runCaptureSequence();
+          }, 900);
         }
       }, 700);
     }
@@ -1193,7 +1281,6 @@ function goToEditorWithPhotos() {
   State.activeFilterCls = "filter-natural";
   State.activeFrameCls = "frame-none";
   State.placedStickers = [];
-  State.placedTexts = [];
   buildEditorComposition();
   buildFilterStrip();
   buildFrameStrip();
@@ -1221,8 +1308,7 @@ function buildEditorComposition() {
     img.src = dataUrl;
     img.className = "comp-photo " + State.activeFilterCls;
     img.style.width = "260px";
-    img.style.height = count > 1 ? (260 / (count === 2 ? 1.3 : count === 3 ? 1 : 1) ) + "px" : "340px";
-    if (count > 1) img.style.height = "150px";
+    img.style.height = count > 1 ? "150px" : "340px";
     inner.appendChild(img);
   });
 
@@ -1320,7 +1406,6 @@ function switchEditorTab(tabName) {
   document.getElementById("panelFilters").classList.toggle("hidden", tabName !== "filters");
   document.getElementById("panelFrames").classList.toggle("hidden", tabName !== "frames");
   document.getElementById("panelStickers").classList.toggle("hidden", tabName !== "stickers");
-  document.getElementById("panelText").classList.toggle("hidden", tabName !== "text");
 }
 
 /* ---- Stickers: add, drag, pinch-resize, rotate, delete, layering ---- */
@@ -1345,7 +1430,7 @@ function addStickerToComposition(emoji) {
 }
 
 function selectSticker(el) {
-  document.querySelectorAll(".sticker-el, .text-el").forEach(s => {
+  document.querySelectorAll(".sticker-el").forEach(s => {
     s.classList.remove("active-sticker");
     const del = s.querySelector(".sticker-del-btn");
     if (del) del.remove();
@@ -1354,13 +1439,19 @@ function selectSticker(el) {
   const delBtn = document.createElement("div");
   delBtn.className = "sticker-del-btn";
   delBtn.textContent = "✕";
-  delBtn.addEventListener("click", (e) => {
+  const doDelete = (e) => {
     e.stopPropagation();
-    const id = el.id.replace("sticker-", "").replace("text-", "");
+    e.preventDefault();
+    const id = el.id.replace("sticker-", "");
     State.placedStickers = State.placedStickers.filter(s => s.id !== id);
-    State.placedTexts = State.placedTexts.filter(t => t.id !== id);
     el.remove();
-  });
+  };
+  // Intercept on mousedown/touchstart too, so the sticker's own drag
+  // handler (which listens on the same element) never gets a chance
+  // to start a drag before the tap registers as a delete.
+  delBtn.addEventListener("mousedown", doDelete);
+  delBtn.addEventListener("touchstart", doDelete, { passive: false });
+  delBtn.addEventListener("click", doDelete);
   el.appendChild(delBtn);
 }
 
@@ -1466,26 +1557,6 @@ function makeStickerInteractive(el, data) {
   });
 }
 
-/* ---- Text captions ---- */
-document.getElementById("btnAddText")?.addEventListener("click", () => {
-  const input = document.getElementById("textInput");
-  const text = input.value.trim();
-  if (!text) return;
-  const overlay = document.getElementById("editorOverlay");
-  const id = uid();
-  const data = { id, text, x: 50, y: 80, scale: 1, rotation: 0, z: ++stickerZCounter };
-  State.placedTexts.push(data);
-
-  const el = document.createElement("div");
-  el.className = "text-el";
-  el.id = "text-" + id;
-  el.textContent = text;
-  overlay.appendChild(el);
-  makeStickerInteractive(el, data);
-  selectSticker(el);
-  input.value = "";
-});
-
 /* ---- Retake / Done ---- */
 document.getElementById("btnRetake")?.addEventListener("click", () => {
   State.capturedPhotos = [];
@@ -1590,22 +1661,6 @@ async function composeAndShowResult() {
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText(s.emoji, 0, 0);
-    ctx.restore();
-  });
-
-  State.placedTexts.forEach(t => {
-    const px = frameW + (t.x / 100) * OUT_W;
-    const py = frameW + (t.y / 100) * totalH;
-    ctx.save();
-    ctx.translate(px, py);
-    ctx.rotate((t.rotation || 0) * Math.PI / 180);
-    ctx.scale(t.scale, t.scale);
-    ctx.font = "bold 42px -apple-system, sans-serif";
-    ctx.textAlign = "center";
-    ctx.fillStyle = "#ffffff";
-    ctx.shadowColor = "rgba(0,0,0,0.5)";
-    ctx.shadowBlur = 8;
-    ctx.fillText(t.text, 0, 0);
     ctx.restore();
   });
 
@@ -1736,13 +1791,25 @@ document.getElementById("btnDoPrint")?.addEventListener("click", () => {
         "printing isn't supported here — save the photo and print it from your photos app instead.";
       return;
     }
-    // Open a print-friendly window with just the image, sized to the page
+
+    // Open the print window synchronously (inside the click gesture) so
+    // popup blockers don't intercept it, then run the animation while
+    // the print dialog itself doesn't pop up until onload fires below.
     const printWindow = window.open("", "_blank");
     if (!printWindow) {
       document.getElementById("printFallbackNote").textContent =
         "pop-up blocked — allow pop-ups for this site to print, or use save instead.";
       return;
     }
+
+    // Quick "printer feeding a page" animation for visual feedback
+    const animWrap = document.getElementById("printingAnim");
+    const page = document.getElementById("printerPage");
+    animWrap.classList.remove("hidden");
+    page.style.animation = "none";
+    void page.offsetWidth;
+    page.style.animation = "printFeedOut 1.6s ease forwards";
+
     const dims = PRINT_FORMATS[State.printFormat];
     printWindow.document.write(`
       <html><head><title>Print</title>
@@ -1751,9 +1818,14 @@ document.getElementById("btnDoPrint")?.addEventListener("click", () => {
         html,body { margin:0; padding:0; }
         img { width:100%; height:100%; object-fit:cover; display:block; }
       </style>
-      </head><body><img src="${dataUrl}" onload="window.print();"></body></html>
+      </head><body><img src="${dataUrl}"></body></html>
     `);
     printWindow.document.close();
+
+    setTimeout(() => {
+      animWrap.classList.add("hidden");
+      printWindow.print();
+    }, 1500);
   });
 });
 

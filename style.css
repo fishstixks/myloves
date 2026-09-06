@@ -4,7 +4,7 @@
    golden accents. Mobile-first. (Deliberately not pink.)
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Space+Grotesk:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 :root {
   /* ---- Palette ---- */
@@ -30,7 +30,7 @@
   --mint:         var(--moss);
 
   /* ---- Type ---- */
-  --font-display: 'Fraunces', 'Iowan Old Style', serif;
+  --font-display: 'Archivo Black', 'Helvetica Neue', Arial, sans-serif;
   --font-body: 'Space Grotesk', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
 
   /* ---- Layout ---- */
@@ -179,10 +179,10 @@ input, select {
 .home-title {
   font-family: var(--font-display);
   font-size: clamp(30px, 8vw, 44px);
-  font-weight: 400;
+  font-weight: 900;
   margin: 0 0 10px;
   color: var(--pink-deep);
-  letter-spacing: 0.5px;
+  letter-spacing: -0.5px;
 }
 .heart-pulse {
   display: inline-block;
@@ -262,7 +262,8 @@ input, select {
   font-size: clamp(22px, 6vw, 30px);
   color: var(--pink-deep);
   margin: 0 0 14px;
-  font-weight: 400;
+  font-weight: 900;
+  letter-spacing: -0.3px;
 }
 .msg-body {
   font-size: 15px;
@@ -544,47 +545,78 @@ input, select {
 }
 
 /* ============================================================ */
-/* LEVEL 6 — beat the billionaires */
+/* LEVEL 7 — mini cooper mall parking lot (driving level) */
 /* ============================================================ */
-.money-counter {
-  font-family: var(--font-display);
-  font-size: clamp(36px, 12vw, 56px);
-  color: var(--pink-deep);
-  margin-bottom: 24px;
-  font-weight: 700;
+.drive-screen { padding-bottom: 0; }
+.wanted-meter {
+  font-size: 14px;
+  letter-spacing: 1px;
 }
-.tap-coin {
-  font-size: 90px;
-  animation: coinIdle 2s ease-in-out infinite;
-  margin-bottom: 20px;
+.drive-wrap {
+  padding-top: 8px;
+  min-height: calc(100vh - 120px);
+  min-height: calc(100dvh - 120px);
 }
-@keyframes coinIdle {
-  0%, 100% { transform: scale(1) rotate(0deg); }
-  50% { transform: scale(1.06) rotate(-4deg); }
+.drive-stage {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  height: 60vh;
+  margin-top: 14px;
+  background:
+    repeating-linear-gradient(0deg, rgba(58,51,44,0.06) 0 2px, transparent 2px 40px),
+    repeating-linear-gradient(90deg, rgba(58,51,44,0.06) 0 2px, transparent 2px 40px),
+    var(--paper-deep);
+  border-radius: var(--radius-md);
+  border: 2px solid var(--ink-soft);
+  overflow: hidden;
+  touch-action: none;
+  cursor: grab;
 }
-.rich-list {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-size: 13px;
-  color: var(--ink-soft);
-  max-width: 280px;
-}
-.rich-beaten {
-  text-decoration: line-through;
-  opacity: 0.4;
-}
-.money-float {
+.drive-stage:active { cursor: grabbing; }
+.drive-car {
   position: absolute;
-  font-size: 20px;
-  font-weight: 800;
-  color: var(--pink-deep);
+  transform: translate(-50%, -50%);
+  font-size: 34px;
+  transition: left 0.05s linear, top 0.05s linear;
+  z-index: 3;
   pointer-events: none;
-  animation: moneyFloat 0.8s ease forwards;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.25));
 }
-@keyframes moneyFloat {
-  0% { opacity: 1; transform: translateY(0); }
-  100% { opacity: 0; transform: translateY(-60px); }
+.drive-obstacle {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  font-size: 26px;
+  pointer-events: none;
+  z-index: 2;
+  animation: obstaclePop 0.25s ease;
+}
+@keyframes obstaclePop {
+  0% { transform: translate(-50%, -50%) scale(0); }
+  100% { transform: translate(-50%, -50%) scale(1); }
+}
+.obstacle-hit {
+  animation: obstacleScatter 0.35s ease forwards !important;
+}
+@keyframes obstacleScatter {
+  0% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1.6) rotate(60deg) translateY(-20px); opacity: 0; }
+}
+.drive-pop-text {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 15px;
+  color: var(--clay-deep);
+  pointer-events: none;
+  z-index: 4;
+  animation: popTextFloat 0.7s ease forwards;
+}
+@keyframes popTextFloat {
+  0% { opacity: 1; transform: translate(-50%, -50%) scale(0.8); }
+  30% { transform: translate(-50%, -50%) scale(1.15); }
+  100% { opacity: 0; transform: translate(-50%, -80%) scale(1); }
 }
 
 /* ============================================================ */
@@ -602,6 +634,8 @@ input, select {
 .ending-line {
   font-family: var(--font-display);
   font-size: clamp(18px, 5vw, 24px);
+  font-weight: 900;
+  letter-spacing: -0.2px;
   color: #F3E8D3;
   opacity: 0;
   transition: opacity 1.6s ease;
@@ -849,10 +883,13 @@ input, select {
   position: relative;
   background: #000;
   box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-  overflow: hidden;
+  overflow: visible;
   touch-action: none;
   max-width: 100%;
   max-height: 50vh;
+}
+.editor-composition #compInner {
+  overflow: hidden;
 }
 .editor-composition img.comp-photo {
   display: block;
@@ -872,29 +909,22 @@ input, select {
   outline: 2px dashed var(--pink-deep);
   outline-offset: 4px;
 }
-.text-el {
-  position: absolute;
-  color: white;
-  font-weight: 700;
-  font-size: 20px;
-  text-shadow: 0 2px 6px rgba(0,0,0,0.5);
-  touch-action: none;
-  cursor: grab;
-  white-space: nowrap;
-}
 .sticker-del-btn {
   position: absolute;
   top: -10px;
   right: -10px;
   background: var(--pink-deep);
   color: white;
-  width: 22px;
-  height: 22px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
-  font-size: 12px;
+  font-size: 13px;
   display: flex;
   align-items: center;
   justify-content: center;
+  touch-action: manipulation;
+  pointer-events: auto;
+  z-index: 999;
 }
 
 .editor-tabs {
@@ -983,17 +1013,6 @@ input, select {
   text-align: center;
   flex-shrink: 0;
 }
-#panelText {
-  display: flex;
-  gap: 8px;
-}
-#textInput {
-  flex: 1;
-  padding: 10px 14px;
-  border-radius: 999px;
-  border: 1px solid var(--blush-deep);
-  background: white;
-}
 
 .editor-actions {
   display: flex;
@@ -1063,6 +1082,47 @@ input, select {
   box-shadow: var(--shadow-soft);
   margin-bottom: 16px;
   background: white;
+}
+.printing-anim {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.printing-anim.hidden { display: none; }
+.printer-slot {
+  width: 120px;
+  height: 14px;
+  background: var(--ink);
+  border-radius: 3px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
+}
+.printer-page {
+  position: absolute;
+  left: 10px;
+  top: -46px;
+  width: 100px;
+  height: 46px;
+  background: white;
+  border-radius: 2px 2px 0 0;
+  box-shadow: var(--shadow-soft);
+  animation: printFeedOut 1.6s ease forwards;
+}
+@keyframes printFeedOut {
+  0%   { top: -46px; }
+  100% { top: 40px; }
+}
+.printing-label {
+  font-size: 13px;
+  color: var(--ink-soft);
+  animation: printingPulse 1s ease-in-out infinite;
+}
+@keyframes printingPulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
 }
 
 /* ============================================================ */
@@ -1184,6 +1244,8 @@ input, select {
 }
 .modal-box h3 {
   font-family: var(--font-display);
+  font-weight: 900;
+  letter-spacing: -0.2px;
   color: var(--pink-deep);
   margin-top: 0;
 }
@@ -1224,20 +1286,151 @@ input, select {
 
 /* ============================================================ */
 /* FRAME STYLES — applied to .editor-composition / final canvas border look */
+/* Each frame adds real texture/decoration, not just a flat border. */
 /* ============================================================ */
-.frame-classic  { border: 14px solid #fff; }
-.frame-white    { border: 20px solid #fff; }
-.frame-black    { border: 16px solid #1a1a1a; }
-.frame-pink     { border: 16px solid var(--pink-deep); }
-.frame-minimal  { border: 4px solid #fff; }
-.frame-filmstrip{ border: 10px solid #111; }
-.frame-polaroid { border: 14px solid #fff; border-bottom-width: 46px; }
-.frame-cute     { border: 12px solid var(--blush-deep); }
-.frame-heart    { border: 14px solid var(--clay); }
-.frame-travel   { border: 14px solid var(--mint); }
-.frame-date     { border: 14px solid var(--butter); }
-.frame-scrapbook{ border: 16px dashed var(--lilac); }
 .frame-none     { border: 0; }
+
+.frame-classic  {
+  border: 12px solid #fff;
+  outline: 2px solid #cfc6b8;
+  outline-offset: -12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3), inset 0 0 0 1px rgba(0,0,0,0.05);
+}
+
+.frame-white    {
+  border: 18px solid #fff;
+  box-shadow: 0 12px 34px rgba(0,0,0,0.3), inset 0 0 20px rgba(0,0,0,0.05);
+}
+
+.frame-black    {
+  border: 14px solid #111;
+  outline: 1px solid #444;
+  outline-offset: -14px;
+  box-shadow: 0 12px 34px rgba(0,0,0,0.45);
+}
+
+.frame-pink     {
+  border: 14px solid var(--pink-deep);
+  background: linear-gradient(135deg, var(--pink-deep), #ffb6cf);
+  box-shadow: 0 10px 26px rgba(255, 92, 138, 0.35);
+}
+
+.frame-minimal  {
+  border: 3px solid #fff;
+  outline: 1px solid rgba(0,0,0,0.15);
+  outline-offset: -3px;
+}
+
+.frame-filmstrip {
+  border: 10px solid #111;
+  border-left-width: 26px;
+  border-right-width: 26px;
+  background-image:
+    radial-gradient(circle, #fff 3px, transparent 3.5px);
+  background-size: 100% 26px;
+  background-position: -8px 0, -8px 0;
+  background-repeat: repeat-y;
+  background-color: #111;
+}
+
+.frame-polaroid {
+  border: 12px solid #fff;
+  border-bottom-width: 48px;
+  box-shadow: 0 14px 28px rgba(0,0,0,0.35), 0 2px 0 rgba(0,0,0,0.05) inset;
+  position: relative;
+}
+.frame-polaroid::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 14px;
+  transform: translateX(-50%) rotate(-2deg);
+  width: 60%;
+  height: 2px;
+  background: repeating-linear-gradient(90deg, #d8cfc0 0 6px, transparent 6px 12px);
+  pointer-events: none;
+}
+
+.frame-cute {
+  border: 12px solid var(--blush-deep);
+  box-shadow: 0 10px 26px rgba(181, 101, 46, 0.3);
+  position: relative;
+}
+.frame-cute::before, .frame-cute::after {
+  content: "🎀";
+  position: absolute;
+  font-size: 26px;
+  z-index: 5;
+  pointer-events: none;
+}
+.frame-cute::before { top: -18px; left: -14px; transform: rotate(-15deg); }
+.frame-cute::after  { bottom: -18px; right: -14px; transform: rotate(165deg); }
+
+.frame-heart {
+  border: 14px solid var(--clay);
+  box-shadow: 0 10px 26px rgba(181, 101, 46, 0.3);
+  position: relative;
+}
+.frame-heart::before, .frame-heart::after {
+  content: "❤️";
+  position: absolute;
+  font-size: 22px;
+  z-index: 5;
+  pointer-events: none;
+}
+.frame-heart::before { top: -12px; left: -12px; }
+.frame-heart::after  { bottom: -12px; right: -12px; }
+
+.frame-travel {
+  border: 14px solid var(--mint);
+  box-shadow: 0 10px 26px rgba(107, 122, 94, 0.3);
+  position: relative;
+}
+.frame-travel::before {
+  content: "✈️ 🗺️ 📍";
+  position: absolute;
+  top: -30px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 18px;
+  letter-spacing: 6px;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.frame-date {
+  border: 14px solid var(--butter);
+  background: linear-gradient(135deg, var(--butter), #f6dd9a);
+  box-shadow: 0 10px 26px rgba(232, 196, 104, 0.35);
+  position: relative;
+}
+.frame-date::after {
+  content: "✨";
+  position: absolute;
+  bottom: -14px;
+  right: -10px;
+  font-size: 22px;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.frame-scrapbook {
+  border: 16px dashed var(--lilac);
+  background: repeating-linear-gradient(45deg, rgba(91,74,90,0.05) 0 8px, transparent 8px 16px);
+  box-shadow: 0 10px 26px rgba(91, 74, 90, 0.3);
+  position: relative;
+}
+.frame-scrapbook::before, .frame-scrapbook::after {
+  content: "✂️";
+  position: absolute;
+  font-size: 18px;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0.85;
+}
+.frame-scrapbook::before { top: -10px; left: 12px; transform: rotate(-20deg); }
+.frame-scrapbook::after  { bottom: -10px; right: 12px; transform: rotate(160deg); }
 
 /* ============================================================ */
 /* RESPONSIVE — small phones */

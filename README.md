@@ -18,7 +18,7 @@ No backend, no build step, no database — just HTML, CSS, and vanilla JavaScrip
 ├── apple.jpg            optional — a real photo of Apple for the "Find
 │                         Apple" level (falls back to 🐶 if missing)
 ├── dessert.mp3, shopping.mp3, expensive.mp3, food.mp3,
-│   apple.mp3, billionaire.mp3, ending.mp3     music, one per level
+│   apple.mp3, drive.mp3, ending.mp3     music, one per level
 └── apology.mp4          the final apology video
 ```
 
@@ -51,7 +51,7 @@ shopping.mp3
 expensive.mp3
 food.mp3
 apple.mp3
-billionaire.mp3
+drive.mp3
 ending.mp3
 ```
 
