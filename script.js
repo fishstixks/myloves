@@ -227,6 +227,16 @@ const MusicSystem = (() => {
   let pendingKey = null;
   let fadeInterval = null;
 
+  // A missing/404/corrupt file fires "error" on the element itself rather
+  // than rejecting play() the same way an autoplay block does. Without this,
+  // a bad src can leave the status label stuck on "tap to start music"
+  // forever, with a retry that can never succeed.
+  audioEl.addEventListener("error", () => {
+    if (!currentKey) return; // no track was ever loaded (e.g. initial empty src)
+    pendingKey = null;
+    updateStatusLabel("no track");
+  });
+
   function fadeTo(targetVolume, duration, onDone) {
     clearInterval(fadeInterval);
     const steps = 20;
@@ -264,8 +274,15 @@ const MusicSystem = (() => {
         playPromise.then(() => {
           fadeTo(muted ? 0 : sliderVol, 700);
           updateStatusLabel(key);
-        }).catch(() => {
-          // Autoplay blocked — wait for a user gesture, then retry once.
+        }).catch((err) => {
+          // Only a real autoplay block should show "tap to start" and wire
+          // up a retry. Anything else (bad/missing file, decode error) would
+          // never succeed on retry, so skip gracefully instead of hanging.
+          const isAutoplayBlock = err && (err.name === "NotAllowedError" || err.name === "AbortError");
+          if (!isAutoplayBlock) {
+            updateStatusLabel("no track");
+            return;
+          }
           pendingKey = key;
           updateStatusLabel("tap to start music");
           const retry = () => {
@@ -484,12 +501,12 @@ function endLevelDessert() {
    9. LEVEL 2 — SHOPPING (Sephora / clothes)
    ================================================================ */
 const SHOPPING_ITEMS = [
-  { image: "shop1.jpg", name: "Good Girl Perfume", price: "$98", size: "tall" },
-  { image: "shop2.jpg", name: "Terminator Model Kit", price: "$36", size: "med" },
-  { image: "shop3.jpg", name: "Catkin Lipstick Set", price: "$64", size: "wide" },
-  { image: "shop4.jpg", name: "Dior Lip Glow Balm", price: "$42", size: "small" },
-  { image: "shop5.jpg", name: "One Piece Bracelet", price: "$29", size: "med" },
-  { image: "shop6.jpg", name: "One Piece Cuff", price: "$29", size: "small" }
+  { image: "shop1.jpg", name: "Good Girl Perfume", price: "$98" },
+  { image: "shop2.jpg", name: "Terminator Model Kit", price: "$36" },
+  { image: "shop3.jpg", name: "Catkin Lipstick Set", price: "$64" },
+  { image: "shop4.jpg", name: "Dior Lip Glow Balm", price: "$42" },
+  { image: "shop5.jpg", name: "One Piece Bracelet", price: "$29" },
+  { image: "shop6.jpg", name: "One Piece Cuff", price: "$29" }
 ];
 
 function startLevelShopping() {
@@ -504,7 +521,7 @@ function startLevelShopping() {
   grid.innerHTML = "";
   SHOPPING_ITEMS.forEach((item, idx) => {
     const card = document.createElement("button");
-    card.className = "shop-item shop-item-" + item.size;
+    card.className = "shop-item";
     card.innerHTML = `<img class="shop-image" src="${item.image}" alt="${item.name}">
       <span class="shop-name">${item.name}</span>
       <span class="shop-price">${item.price}</span>`;

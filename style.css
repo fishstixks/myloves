@@ -142,14 +142,21 @@ input, select {
 .music-status {
   font-size: 10px;
   color: var(--ink-soft);
-  max-width: 70px;
+  max-width: 90px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  display: none;
+  display: inline-block;
+  background: none;
+  border: none;
+  font-family: inherit;
+  cursor: pointer;
+  padding: 4px 2px;
+  text-decoration: underline;
+  text-decoration-color: transparent;
 }
-@media (min-width: 420px) {
-  .music-status { display: inline-block; }
+.music-status:active {
+  opacity: 0.6;
 }
 
 /* ============================================================ */
@@ -390,7 +397,22 @@ input, select {
 /* ============================================================ */
 /* LEVEL 2 & 3 — shopping grids */
 /* ============================================================ */
+/* Level 2 — uniform square photo grid */
 .shop-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  padding: 12px 20px;
+  position: relative;
+  z-index: 2;
+}
+@media (min-width: 480px) {
+  .shop-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* Level 3 — compact text/emoji grids (regular store + bargain store) */
+.expensive-grid,
+.bargain-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   grid-auto-rows: 64px;
@@ -399,6 +421,7 @@ input, select {
   position: relative;
   z-index: 2;
 }
+
 .shop-item {
   background: var(--white);
   border-radius: var(--radius-md);
@@ -411,10 +434,6 @@ input, select {
   flex-direction: column;
   overflow: hidden;
 }
-.shop-item-wide  { grid-column: span 4; grid-row: span 3; flex-direction: row; align-items: center; text-align: left; gap: 10px; }
-.shop-item-tall  { grid-column: span 2; grid-row: span 5; }
-.shop-item-med   { grid-column: span 2; grid-row: span 4; }
-.shop-item-small { grid-column: span 2; grid-row: span 3; }
 .shop-item:active { transform: scale(0.95); }
 .shop-item.selected {
   border: 2px solid var(--clay-deep);
@@ -434,13 +453,12 @@ input, select {
 }
 .shop-image {
   width: 100%;
-  flex: 1;
-  min-height: 0;
+  aspect-ratio: 1 / 1;
+  flex: none;
   object-fit: cover;
   border-radius: 10px;
   margin-bottom: 6px;
 }
-.shop-item-wide .shop-image { width: 90px; height: 100%; flex: none; margin-bottom: 0; }
 .shop-name { font-size: 12px; font-weight: 600; line-height: 1.25; }
 .shop-price { font-size: 11px; color: var(--ink-soft); margin-top: 2px; }
 

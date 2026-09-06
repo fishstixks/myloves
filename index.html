@@ -18,7 +18,7 @@
 <div id="musicBar" class="music-bar">
   <button id="muteBtn" class="icon-btn" aria-label="Toggle music">🔊</button>
   <input id="volumeSlider" type="range" min="0" max="1" step="0.01" value="0.6" aria-label="Music volume">
-  <span id="musicStatus" class="music-status">—</span>
+  <button type="button" id="musicStatus" class="music-status">—</button>
 </div>
 
 <!-- ============================================================ -->
@@ -95,7 +95,7 @@
   </div>
   <div id="expensivePhaseA">
     <p class="game-caption">the regular store...</p>
-    <div class="shop-grid" id="expensiveGrid"></div>
+    <div class="expensive-grid" id="expensiveGrid"></div>
     <button class="cta-btn small-cta" id="btnExpensiveReact">check total →</button>
   </div>
 
@@ -113,7 +113,7 @@
 
   <div id="expensivePhaseD" class="hidden">
     <p class="game-caption">bargain finds incoming 🛍️</p>
-    <div class="shop-grid bargain-grid" id="bargainGrid"></div>
+    <div class="bargain-grid" id="bargainGrid"></div>
     <div class="cart-total">total: <b id="bargainTotal">$0.00</b></div>
     <button class="cta-btn small-cta hidden" id="btnPlaceOrder">place order →</button>
   </div>
