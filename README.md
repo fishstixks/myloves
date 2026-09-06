@@ -14,15 +14,15 @@ No backend, no build step, no database — just HTML, CSS, and vanilla JavaScrip
 ├── style.css            all styling
 ├── script.js             all behavior — game levels, camera, editor, album
 ├── README.md            this file
-└── assets/
-    ├── music/            mp3s for each game level + ending
-    ├── video/             the final apology video
-    ├── images/            (optional — reserved for future use)
-    ├── frames/            (optional — reserved if you add custom frame images)
-    └── stickers/          (optional — reserved if you add custom sticker images)
+├── shop1.jpg – shop6.jpg   shopping level product photos (already included)
+├── apple.jpg            optional — a real photo of Apple for the "Find
+│                         Apple" level (falls back to 🐶 if missing)
+├── dessert.mp3, shopping.mp3, expensive.mp3, food.mp3,
+│   apple.mp3, billionaire.mp3, ending.mp3     music, one per level
+└── apology.mp4          the final apology video
 ```
 
-The game and photobooth both work immediately with placeholder/emoji-based content. You only need to add your own MP3s and the final video for the full experience — everything else (games, camera, filters, stickers, album) already works out of the box.
+Everything sits directly next to `index.html` — no subfolders. The game and photobooth both work immediately with placeholder/emoji-based content. The shopping level images are already included. You only need to add your own MP3s, the final video, and (optionally) a real photo of Apple for the full experience — everything else already works out of the box.
 
 ---
 
@@ -37,37 +37,33 @@ The game and photobooth both work immediately with placeholder/emoji-based conte
 
 ### Step 2 — Upload the files
 1. On your new repository page, click **Add file → Upload files**.
-2. Drag in `index.html`, `style.css`, `script.js`, `README.md`, and the entire `assets` folder (with its subfolders).
+2. Drag in every file — `index.html`, `style.css`, `script.js`, `README.md`, the `shop1.jpg`–`shop6.jpg` images — all flat, with no folders.
 3. Scroll down and click **Commit changes**.
 
 *(If you're comfortable with git, you can instead clone the repo locally, copy these files in, and `git push` — same result.)*
 
 ### Step 3 — Add your MP3s
-Upload your music files into `assets/music/` using these exact filenames (or change the filenames in the configuration — see Step 6):
+Upload your music files using these exact filenames (or change the filenames in the configuration — see Step 6), directly alongside `index.html`:
 
 ```
-assets/music/dessert.mp3
-assets/music/shopping.mp3
-assets/music/expensive.mp3
-assets/music/food.mp3
-assets/music/apple.mp3
-assets/music/billionaire.mp3
-assets/music/ending.mp3
+dessert.mp3
+shopping.mp3
+expensive.mp3
+food.mp3
+apple.mp3
+billionaire.mp3
+ending.mp3
 ```
 
 If a file is missing, that level will just play silently — the app will never crash because of a missing song.
 
 ### Step 4 — Add the final video
-Upload your video as:
-
-```
-assets/video/apology.mp4
-```
+Upload your video as `apology.mp4`, directly alongside `index.html`.
 
 Keep the video reasonably compressed (under ~50MB is safest for smooth playback on mobile data). MP4 (H.264) has the best iPhone Safari compatibility.
 
-### Step 5 — (Optional) Add custom stickers/frames
-The app ships with emoji-based stickers and CSS-drawn frames that already work fully. If you'd like to swap in your own image assets later, drop them into `assets/stickers/` or `assets/frames/` and reference them in the configuration section described below — this is optional.
+### Step 5 — (Optional) Add a real photo of Apple
+The "Find Apple" level ships with an emoji fallback (🐶) that works immediately. If you'd like to use a real photo instead, upload a square-ish image as `apple.jpg` directly alongside `index.html` — no extra setup needed.
 
 ### Step 6 — Change configuration
 Open `script.js` in GitHub's web editor (click the pencil icon on the file) and look for the `CONFIG` object at the very top. Everything you'd want to personalize lives there in one place:
@@ -97,6 +93,9 @@ The first time she taps "Take Photos," Safari will ask for camera permission. Sh
 
 ### Step 10 — Enjoy
 That's it — no server, no ongoing cost, no account needed.
+
+### A note on caching
+GitHub Pages and mobile Safari can both cache aggressively. If you update files later and don't see the changes live, try a hard refresh, or bump the version numbers in `index.html`'s `style.css?v=2` and `script.js?v=2` tags (e.g. to `?v=3`) — that forces the browser to fetch fresh copies instead of reusing old cached ones. Always upload all three files (`index.html`, `style.css`, `script.js`) together in the same commit so they can't end up out of sync with each other.
 
 ---
 

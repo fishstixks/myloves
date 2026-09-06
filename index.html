@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>for Julie Ann ❤️</title>
-<meta name="theme-color" content="#ffe3ec">
-<link rel="stylesheet" href="style.css">
+<meta name="theme-color" content="#EFE6D4">
+<link rel="stylesheet" href="style.css?v=2">
 </head>
 <body>
 
@@ -26,7 +26,7 @@
 <!-- ============================================================ -->
 <section id="screen-home" class="screen active">
   <div class="home-wrap">
-    <div class="home-decor" aria-hidden="true">🌸</div>
+    <div class="home-decor" aria-hidden="true">🍂</div>
     <h1 class="home-title">for <span id="homeNameSpan">Julie Ann</span> <span class="heart-pulse">❤️</span></h1>
     <p class="home-subtitle">just something I made for you.</p>
 
@@ -53,7 +53,7 @@
   <div class="center-wrap">
     <div class="big-emoji-float">🎮</div>
     <h2 class="msg-title">a little game, just for you</h2>
-    <p class="msg-body">six tiny levels. shouldn't take long. made with you in mind the whole way through.</p>
+    <p class="msg-body">seven tiny levels. shouldn't take long. made with you in mind the whole way through.</p>
     <button class="cta-btn" id="btnStartGame">let's go →</button>
   </div>
 </section>
@@ -129,21 +129,28 @@
     <p class="msg-body">julie is happy.</p>
     <button class="cta-btn" id="btnAfterHaul">next →</button>
   </div>
+
+  <div id="expensivePhaseG" class="hidden center-wrap">
+    <div class="big-emoji-float">😏</div>
+    <h2 class="msg-title">...just kidding.</h2>
+    <p class="msg-body">the pinduoduo haul was a bit. I'm going to buy all of these for you once you're back.</p>
+    <button class="cta-btn" id="btnAfterTwist">next →</button>
+  </div>
 </section>
 
 <!-- ============================================================ -->
-<!-- LEVEL 4: FOOD & DRINK RUN -->
+<!-- LEVEL 4: MALL RUN (point-and-tap story) -->
 <!-- ============================================================ -->
 <section id="screen-level-food" class="screen">
   <div class="level-hud">
-    <span class="level-label">LEVEL 4 · FOOD RUN</span>
-    <span class="level-score">points: <b id="foodScore">0</b></span>
+    <span class="level-label">LEVEL 4 · MALL RUN</span>
   </div>
-  <div class="game-stage" id="foodStage">
-    <div class="catcher runner" id="foodCatcher">🏃‍♀️</div>
+  <div class="center-wrap">
+    <div class="big-emoji-float" id="mallSceneEmoji">🗺️</div>
+    <h2 class="msg-title" id="mallSceneTitle">the mall</h2>
+    <p class="msg-body" id="mallSceneText"></p>
+    <button class="cta-btn" id="btnMallNext">continue →</button>
   </div>
-  <div class="buff-bar" id="buffBar"></div>
-  <p class="game-caption" id="foodCaption">grab the good stuff 🧋</p>
 </section>
 
 <!-- ============================================================ -->
@@ -162,7 +169,22 @@
 </section>
 
 <!-- ============================================================ -->
-<!-- LEVEL 6: BEAT THE BILLIONAIRES -->
+<!-- LEVEL 6: HER GAMES (Sims / Palworld / MLBB) -->
+<!-- ============================================================ -->
+<section id="screen-level-hergames" class="screen">
+  <div class="level-hud">
+    <span class="level-label">LEVEL 6 · HER GAMES</span>
+  </div>
+  <div class="center-wrap">
+    <div class="big-emoji-float" id="hergamesEmoji">🎮</div>
+    <h2 class="msg-title" id="hergamesTitle"></h2>
+    <p class="msg-body" id="hergamesText"></p>
+    <button class="cta-btn" id="btnHerGamesNext">next →</button>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- LEVEL 7: BEAT THE BILLIONAIRES -->
 <!-- ============================================================ -->
 <section id="screen-level-billionaires" class="screen">
   <div class="center-wrap">
@@ -384,6 +406,6 @@
 
 <!-- audio elements are created dynamically in JS -->
 
-<script src="script.js"></script>
+<script src="script.js?v=2"></script>
 </body>
 </html>

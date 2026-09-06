@@ -10,21 +10,21 @@
 const CONFIG = {
   JULIE_NAME: "Julie Ann",
 
-  // ---- Music files (place in assets/music/) ----
+  // ---- Music files (place in the same folder as index.html) ----
   // Set any value to null if you don't have that track yet — the
   // app will simply skip music for that section without crashing.
   music: {
-    dessert:     "assets/music/dessert.mp3",
-    shopping:    "assets/music/shopping.mp3",
-    expensive:   "assets/music/expensive.mp3",
-    food:        "assets/music/food.mp3",
-    apple:       "assets/music/apple.mp3",
-    billionaire: "assets/music/billionaire.mp3",
-    ending:      "assets/music/ending.mp3"
+    dessert:     "dessert.mp3",
+    shopping:    "shopping.mp3",
+    expensive:   "expensive.mp3",
+    food:        "food.mp3",
+    apple:       "apple.mp3",
+    billionaire: "billionaire.mp3",
+    ending:      "ending.mp3"
   },
 
-  // ---- Final video (place in assets/video/) ----
-  endingVideo: "assets/video/apology.mp4",
+  // ---- Final video (place in the same folder as index.html) ----
+  endingVideo: "apology.mp4",
 
   // ---- Game messages — tweak freely ----
   messages: {
@@ -51,8 +51,7 @@ const CONFIG = {
       "You made it to the end.",
       "I know this doesn't fix what happened.",
       "But I wanted to make something just for you.",
-      "I'm sorry, Julie.",
-      "Really."
+      "I'm sorry, Julie."
     ]
   },
 
@@ -64,7 +63,7 @@ const CONFIG = {
     cream: "#fff8f3"
   },
 
-  // ---- Sticker categories & emoji sets (swap for real images in assets/stickers/ if desired) ----
+  // ---- Sticker categories & emoji sets (swap for real images if desired) ----
   stickerCategories: {
     hearts:   ["❤️","💕","💗","💖","💘","🩷"],
     stars:    ["⭐","✨","🌟","💫"],
@@ -142,8 +141,6 @@ const State = {
   shoppingCart: [],
   bargainCart: [],
   bargainTotal: 0,
-  foodScore: 0,
-  foodBuffs: {},
   money: 1,
   billionairesBeaten: 0,
   // Photobooth
@@ -197,7 +194,7 @@ document.addEventListener("click", (e) => {
 /* ================================================================
    4. AMBIENT SPARKLE LAYER (purely cosmetic, low frequency)
    ================================================================ */
-const SPARKLE_EMOJIS = ["✨", "💕", "🌸", "⭐", "🎀"];
+const SPARKLE_EMOJIS = ["✨", "🍂", "⭐", "🌿", "🍯"];
 function spawnSparkle() {
   const layer = document.getElementById("sparkleLayer");
   if (!layer) return;
@@ -491,14 +488,12 @@ function endLevelDessert() {
    9. LEVEL 2 — SHOPPING (Sephora / clothes)
    ================================================================ */
 const SHOPPING_ITEMS = [
-  { emoji: "💄", name: "Lip Tint", price: "$18" },
-  { emoji: "🧴", name: "Serum", price: "$32" },
-  { emoji: "👗", name: "Sundress", price: "$45" },
-  { emoji: "👜", name: "Tote Bag", price: "$38" },
-  { emoji: "🕶️", name: "Sunglasses", price: "$24" },
-  { emoji: "💅", name: "Nail Set", price: "$14" },
-  { emoji: "🧢", name: "Cap", price: "$20" },
-  { emoji: "👠", name: "Heels", price: "$52" }
+  { image: "shop1.jpg", name: "Good Girl Perfume", price: "$98", size: "tall" },
+  { image: "shop2.jpg", name: "Terminator Model Kit", price: "$36", size: "med" },
+  { image: "shop3.jpg", name: "Catkin Lipstick Set", price: "$64", size: "wide" },
+  { image: "shop4.jpg", name: "Dior Lip Glow Balm", price: "$42", size: "small" },
+  { image: "shop5.jpg", name: "One Piece Bracelet", price: "$29", size: "med" },
+  { image: "shop6.jpg", name: "One Piece Cuff", price: "$29", size: "small" }
 ];
 
 function startLevelShopping() {
@@ -513,8 +508,8 @@ function startLevelShopping() {
   grid.innerHTML = "";
   SHOPPING_ITEMS.forEach((item, idx) => {
     const card = document.createElement("button");
-    card.className = "shop-item";
-    card.innerHTML = `<span class="shop-emoji">${item.emoji}</span>
+    card.className = "shop-item shop-item-" + item.size;
+    card.innerHTML = `<img class="shop-image" src="${item.image}" alt="${item.name}">
       <span class="shop-name">${item.name}</span>
       <span class="shop-price">${item.price}</span>`;
     card.addEventListener("click", () => {
@@ -572,7 +567,7 @@ const BARGAIN_ITEMS = [
 ];
 
 function showPhase(...idsToShow) {
-  ["expensivePhaseA","expensivePhaseB","expensivePhaseC","expensivePhaseD","expensivePhaseE","expensivePhaseF"]
+  ["expensivePhaseA","expensivePhaseB","expensivePhaseC","expensivePhaseD","expensivePhaseE","expensivePhaseF","expensivePhaseG"]
     .forEach(id => {
       const el = document.getElementById(id);
       if (!el) return;
@@ -694,100 +689,64 @@ function showHaulReveal() {
 }
 
 document.getElementById("btnAfterHaul")?.addEventListener("click", () => {
+  showPhase("expensivePhaseG");
+});
+
+document.getElementById("btnAfterTwist")?.addEventListener("click", () => {
   startLevelFood();
 });
 
 /* ================================================================
-   11. LEVEL 4 — FOOD & DRINK RUN (Singapore-inspired collector)
+   11. LEVEL 4 — MALL RUN (point-and-tap story sequence)
    ================================================================ */
-const FOOD_ITEMS = [
-  { emoji: "🧋", name: "CHAGEE", buff: "points" },
-  { emoji: "🍵", name: "Miss Tea", buff: "speed" },
-  { emoji: "🍗", name: "Wingstop", buff: "power" },
-  { emoji: "🍟", name: "4Fingers", buff: "speedboost" },
-  { emoji: "🍞", name: "Ya Kun Kaya Toast", buff: "energy" },
-  { emoji: "🥔", name: "Salted Egg Chips", buff: "shield" }
+const MALL_SCENES = [
+  { emoji: "🗺️", title: "the mall", text: "in through the front doors. food court's on level 4." },
+  { emoji: "🚻", title: "quick stop", text: "detour to the bathroom first — priorities." },
+  { emoji: "😤", title: "an obstacle", text: "an entitled auntie plants herself directly in the walkway and does not move." },
+  { emoji: "🙄", title: "excuse me", text: "julie squeezes past anyway. no eye contact. no apology given or received." },
+  { emoji: "🧋", title: "the order", text: "finally — the food court. bubble tea, wings, and kaya toast, all at once." },
+  { emoji: "🥡", title: "mission complete", text: "haul secured. time to head back." }
 ];
-const FOOD_GOAL = 16;
-let foodSpawnId = null;
-let foodLoopId = null;
+let mallSceneIdx = 0;
 
 function startLevelFood() {
   goToScreen("screen-level-food");
   MusicSystem.play("food");
-  State.foodScore = 0;
-  State.foodBuffs = {};
-  document.getElementById("foodScore").textContent = "0";
-  document.getElementById("buffBar").innerHTML = "";
-  setCaption("foodCaption", "grab the good stuff 🧋");
+  mallSceneIdx = 0;
+  showMallScene();
+}
 
-  const stage = document.getElementById("foodStage");
-  stage.querySelectorAll(".falling-item").forEach(el => el.remove());
-  const runner = document.getElementById("foodCatcher");
+function showMallScene() {
+  const scene = MALL_SCENES[mallSceneIdx];
+  const emojiEl = document.getElementById("mallSceneEmoji");
+  const titleEl = document.getElementById("mallSceneTitle");
+  const textEl = document.getElementById("mallSceneText");
+  const btn = document.getElementById("btnMallNext");
 
-  function moveCatcherTo(clientX) {
-    const rect = stage.getBoundingClientRect();
-    const pct = clamp(((clientX - rect.left) / rect.width) * 100, 6, 94);
-    runner.style.left = pct + "%";
+  emojiEl.style.opacity = 0;
+  titleEl.style.opacity = 0;
+  textEl.style.opacity = 0;
+  setTimeout(() => {
+    emojiEl.textContent = scene.emoji;
+    titleEl.textContent = scene.title;
+    textEl.textContent = scene.text;
+    emojiEl.style.transition = titleEl.style.transition = textEl.style.transition = "opacity 0.3s ease";
+    emojiEl.style.opacity = 1;
+    titleEl.style.opacity = 1;
+    textEl.style.opacity = 1;
+  }, 180);
+
+  btn.textContent = (mallSceneIdx >= MALL_SCENES.length - 1) ? "next →" : "continue →";
+}
+
+document.getElementById("btnMallNext")?.addEventListener("click", () => {
+  mallSceneIdx++;
+  if (mallSceneIdx >= MALL_SCENES.length) {
+    startLevelApple();
+    return;
   }
-  stage.onmousemove = (e) => moveCatcherTo(e.clientX);
-  stage.ontouchmove = (e) => moveCatcherTo(e.touches[0].clientX);
-  stage.ontouchstart = (e) => moveCatcherTo(e.touches[0].clientX);
-
-  clearInterval(foodSpawnId);
-  clearInterval(foodLoopId);
-  foodSpawnId = setInterval(() => spawnFoodItem(stage), 500);
-  foodLoopId = setInterval(() => checkFoodCollisions(stage, runner), 60);
-}
-
-function spawnFoodItem(stage) {
-  if (State.foodScore >= FOOD_GOAL) return;
-  const item = pick(FOOD_ITEMS);
-  const el = document.createElement("div");
-  el.className = "falling-item";
-  el.textContent = item.emoji;
-  el.dataset.buff = item.buff;
-  el.dataset.name = item.name;
-  el.style.left = rand(6, 90) + "%";
-  const duration = rand(2.8, 4.2);
-  el.style.animationDuration = duration + "s";
-  stage.appendChild(el);
-  setTimeout(() => { if (el.parentNode) el.remove(); }, duration * 1000 + 100);
-}
-
-function checkFoodCollisions(stage, runner) {
-  const runnerRect = runner.getBoundingClientRect();
-  stage.querySelectorAll(".falling-item").forEach(item => {
-    const r = item.getBoundingClientRect();
-    const overlapX = Math.abs((r.left + r.width / 2) - (runnerRect.left + runnerRect.width / 2)) < 40;
-    const overlapY = Math.abs(r.top - runnerRect.top) < 40;
-    if (overlapX && overlapY) {
-      State.foodScore++;
-      document.getElementById("foodScore").textContent = State.foodScore;
-      addBuffChip(item.dataset.name, item.dataset.buff);
-      popScoreText(stage, r.left, r.top, "+1");
-      item.remove();
-
-      if (State.foodScore >= FOOD_GOAL) {
-        clearInterval(foodSpawnId);
-        clearInterval(foodLoopId);
-        setCaption("foodCaption", "run's over — good haul 🥡");
-        setTimeout(() => startLevelApple(), 1500);
-      }
-    }
-  });
-}
-
-function addBuffChip(name, buff) {
-  const bar = document.getElementById("buffBar");
-  const chip = document.createElement("span");
-  chip.className = "buff-chip";
-  chip.textContent = `${name} +${buff}`;
-  bar.appendChild(chip);
-  // keep the buff bar short — remove oldest if too many
-  while (bar.children.length > 4) bar.removeChild(bar.firstChild);
-  setTimeout(() => chip.remove(), 2600);
-}
+  showMallScene();
+});
 
 /* ================================================================
    12. LEVEL 5 — FIND APPLE (the corgi)
@@ -811,44 +770,103 @@ function startLevelApple() {
   }, 1300);
 }
 
+// A fixed room layout — one furniture piece is randomly chosen each
+// playthrough to hide Apple under. Positions are hand-placed (in %)
+// so the room reads as an actual room rather than scattered emoji.
+const ROOM_FURNITURE = [
+  { id: "couch",   emoji: "🛋️", name: "the couch",         left: 8,  top: 46, size: 64 },
+  { id: "curtain", emoji: "🪟", name: "behind the curtain", left: 68, top: 10, size: 52 },
+  { id: "laundry", emoji: "🧺", name: "the laundry basket", left: 55, top: 62, size: 46 },
+  { id: "plant",   emoji: "🪴", name: "the plant",          left: 4,  top: 8,  size: 48 },
+  { id: "box",     emoji: "📦", name: "the box",            left: 30, top: 66, size: 46 },
+  { id: "rug",     emoji: "🔲", name: "under the rug",      left: 34, top: 30, size: 60 }
+];
+
 function setupAppleFindStage() {
   const stage = document.getElementById("appleStage");
   stage.innerHTML = "";
-  const decoySpots = ["🌳","🪴","🧺","📦","🪑","🎈"];
+  stage.classList.add("room-scene");
 
-  // scatter decoys
-  decoySpots.forEach(emoji => {
-    const el = document.createElement("div");
-    el.className = "apple-hidden-spot";
-    el.textContent = emoji;
-    el.style.left = rand(8, 85) + "%";
-    el.style.top = rand(8, 82) + "%";
+  const hidingSpotIdx = Math.floor(Math.random() * ROOM_FURNITURE.length);
+
+  ROOM_FURNITURE.forEach((piece, idx) => {
+    const el = document.createElement("button");
+    el.className = "room-piece";
+    el.style.left = piece.left + "%";
+    el.style.top = piece.top + "%";
+    el.style.fontSize = piece.size + "px";
+    el.innerHTML = `<span class="room-piece-emoji">${piece.emoji}</span>`;
+
+    if (idx === hidingSpotIdx) {
+      // This piece hides Apple — a placeholder photo slot, swap
+      // apple.jpg for a real photo any time.
+      const applePhoto = document.createElement("img");
+      applePhoto.className = "apple-photo hidden";
+      applePhoto.src = "apple.jpg";
+      applePhoto.alt = "Apple the corgi";
+      applePhoto.onerror = () => { applePhoto.replaceWith(Object.assign(document.createElement("span"), { className: "apple-photo-fallback", textContent: "🐶" })); };
+      el.appendChild(applePhoto);
+
+      el.addEventListener("click", () => {
+        el.classList.add("found");
+        const photo = el.querySelector(".apple-photo, .apple-photo-fallback");
+        if (photo) photo.classList.remove("hidden");
+        document.getElementById("appleCaption").textContent = CONFIG.messages.appleLines[2]; // "there he is."
+        setTimeout(() => {
+          document.getElementById("appleCaption").textContent = CONFIG.messages.appleLines[3];
+          setTimeout(() => startLevelHerGames(), 1700);
+        }, 900);
+      }, { once: true });
+    } else {
+      el.addEventListener("click", () => {
+        el.classList.add("checked");
+      });
+    }
+
     stage.appendChild(el);
   });
-
-  // place Apple somewhere random
-  const apple = document.createElement("div");
-  apple.className = "apple-corgi";
-  apple.textContent = "🐶";
-  apple.style.left = rand(15, 78) + "%";
-  apple.style.top = rand(15, 72) + "%";
-  apple.addEventListener("click", () => {
-    document.getElementById("appleCaption").textContent = CONFIG.messages.appleLines[2]; // "there he is."
-    apple.style.transition = "transform 0.3s ease";
-    apple.style.transform = "scale(1.3)";
-    setTimeout(() => {
-      document.getElementById("appleCaption").textContent = CONFIG.messages.appleLines[3];
-      setTimeout(() => startLevelBillionaires(), 1700);
-    }, 900);
-  }, { once: true });
-  stage.appendChild(apple);
 }
 
 /* ================================================================
-   13. LEVEL 6 — BEAT THE BILLIONAIRES
+   12b. LEVEL 6 — HER GAMES (Sims / Palworld / MLBB)
    ================================================================ */
-const MONEY_MILESTONES = [100, 10000, 1000000, 100000000, 1000000000, 999999999999];
-const RICH_CHARACTERS = ["Bezzy McBillion", "Elonora Musketeer", "Rich Uncle Pennybox", "Countess Von Cashflow"];
+const HERGAMES_SCENES = [
+  { emoji: "🏠", title: "The Sims", text: "somewhere, a Sim's house is on fire and julie has already moved on to the next one." },
+  { emoji: "🐾", title: "Palworld", text: "the pals are working overtime. she built an empire out of little guys with guns." },
+  { emoji: "⚔️", title: "MLBB", text: "clutch play in the last thirty seconds. mvp, obviously." }
+];
+let herGamesIdx = 0;
+
+function startLevelHerGames() {
+  goToScreen("screen-level-hergames");
+  MusicSystem.stop();
+  herGamesIdx = 0;
+  showHerGamesScene();
+}
+
+function showHerGamesScene() {
+  const scene = HERGAMES_SCENES[herGamesIdx];
+  document.getElementById("hergamesEmoji").textContent = scene.emoji;
+  document.getElementById("hergamesTitle").textContent = scene.title;
+  document.getElementById("hergamesText").textContent = scene.text;
+  document.getElementById("btnHerGamesNext").textContent =
+    (herGamesIdx >= HERGAMES_SCENES.length - 1) ? "let's go →" : "next →";
+}
+
+document.getElementById("btnHerGamesNext")?.addEventListener("click", () => {
+  herGamesIdx++;
+  if (herGamesIdx >= HERGAMES_SCENES.length) {
+    startLevelBillionaires();
+    return;
+  }
+  showHerGamesScene();
+});
+
+/* ================================================================
+   13. LEVEL 7 — BEAT THE BILLIONAIRES
+   ================================================================ */
+const MONEY_MILESTONES = [10000, 1000000, 999999999999];
+const RICH_CHARACTERS = ["Bezzy McBillion", "Elonora Musketeer", "Countess Von Cashflow"];
 let billionaireIdx = 0;
 
 function startLevelBillionaires() {
@@ -877,7 +895,7 @@ function onTapMoney(e) {
   // Multiplier grows so the count-up doesn't take forever, matching spec's rapid escalation
   const idx = billionaireIdx;
   const target = MONEY_MILESTONES[idx] || MONEY_MILESTONES[MONEY_MILESTONES.length - 1];
-  const jump = Math.max(1, Math.floor((target - State.money) / 6)) || 1;
+  const jump = Math.max(1, Math.floor((target - State.money) / 3)) || 1;
   State.money = Math.min(target, State.money + jump);
   document.getElementById("moneyCounter").textContent = fmtMoney(State.money);
 
@@ -982,7 +1000,7 @@ function startEndingVideo() {
 
   video.src = CONFIG.endingVideo;
   video.onerror = () => {
-    tapOverlay.textContent = "video not found — check assets/video/apology.mp4";
+    tapOverlay.textContent = "video not found — check apology.mp4 was uploaded";
   };
 
   const playPromise = video.play();
